@@ -1,0 +1,2 @@
+CycID	meta3d_Pvalue	meta3d_BH.Q	meta3d_Period	meta3d_Phase	meta3d_Base	meta3d_AMP	meta3d_rAMP
+Gene1	0	0	24	9.00080841696872	4.97780098322627	2.05875599770549	0.413763563722329

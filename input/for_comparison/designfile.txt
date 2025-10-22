@@ -1,0 +1,13 @@
+libraryID	subjectID	hour
+Sample1	1	0
+Sample2	1	2
+Sample3	1	4
+Sample4	1	6
+Sample5	1	8
+Sample6	1	10
+Sample7	1	12
+Sample8	1	14
+Sample9	1	16
+Sample10	1	18
+Sample11	1	20
+Sample12	1	22
