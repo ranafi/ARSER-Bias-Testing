@@ -42,29 +42,6 @@ expression <- expression + rnorm(length(expression), mean = 0, sd = 0.15)
 
 
 
-
-###############################################################################################################################################
-###############################################################################################################################################
-###############################################################################################################################################
-# cosinor 
-
-
-trig_model <- lm(expression ~ cos(times*pi/12) + sin(times*pi/12) ) 
-
-cos_fit <- unname(trig_model$coefficients[2])
-sin_fit <- unname(trig_model$coefficients[3])
-# mesor_fit <- unname(model$coefficients[1])
-
-amp_fit <- unname(sqrt(cos_fit**2 + sin_fit**2))
-phase_rad_fit <- atan2(sin_fit,cos_fit)
-phase_hour_fit <- unname(phase_rad_fit * (24 / (2 * pi)) )
-
-if(phase_hour_fit < 0){
-  phase_hour_fit <- 24 + phase_hour_fit
-}
-
-
-
 ###############################################################################################################################################
 ###############################################################################################################################################
 ###############################################################################################################################################
@@ -179,7 +156,7 @@ y_max <- max(adjusted_expression)
 
 
 fit_x <- seq(0, 48, by = 1)
-fit_y <- cos_fit * cos(fit_x * (2 * pi / 24)) + sin_fit * sin(fit_x * (2 * pi / 24))
+# fit_y <- cos_fit * cos(fit_x * (2 * pi / 24)) + sin_fit * sin(fit_x * (2 * pi / 24))
 
 
 
@@ -189,45 +166,6 @@ data <- data.frame(times = times, adjusted_expression = adjusted_expression)
 
 original_times <- c(0, 6, 12, 18)
 dup_data <- duplicate_timepoints(data, original_times, shift = 24)
-
-fit_data <- data.frame(
-  fit_x = seq(0, 48, by = 1),
-  fit_y = cos_fit * cos(fit_x * (2 * pi / 24)) + sin_fit * sin(fit_x * (2 * pi / 24)) 
-  
-)
-
-fit_data_solid <- subset(fit_data, fit_x <= 18)
-fit_data_dotted <- subset(fit_data, fit_x > 18)
-
-p1 <- ggplot() +
-  geom_point(data = data, aes(x = times, y = adjusted_expression), color = "black", size = 2.2) +
-  
-  geom_point(data = dup_data, aes(x = times, y = adjusted_expression), color = "gray", alpha = 0.9, size = 2.2) +
-  
-  geom_line(data = fit_data_solid, aes(x = fit_x, y = fit_y), color = "blue", linetype = "solid",linewidth = 1.1) +
-  
-  geom_line(data = fit_data_dotted, aes(x = fit_x, y = fit_y), color = "blue", linetype = "dotted",linewidth = 1.1) +
-  
-  
-  scale_x_continuous(limits = c(0, 48), 
-                     breaks = seq(0, 48, by = 6)) +
-  
-  labs(x = "Time (hours)", y = "MESOR-Corrected Expression") +
-  
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "white", colour = NA),
-    plot.background  = element_rect(fill = "white", colour = NA)
-    
-  )
-
-
-
-
-
-
-
-
 
 
 fit_meta <- data.frame(
@@ -239,18 +177,11 @@ fit_meta_dotted<- subset(fit_meta, fit_x >  18)
 
 
 
-
-
-p2 <- ggplot() +
+plot <- ggplot() +
   geom_point(data = data, aes(x = times, y = adjusted_expression), color = "black", size = 2.2) +
   
   geom_point(data = dup_data, aes(x = times, y = adjusted_expression), color = "gray", alpha = 0.9, size = 2.2) +
   
-  # geom_line(data = fit_data_solid, aes(x = fit_x, y = fit_y), color = "blue", linetype = "solid") +
-  # 
-  # geom_line(data = fit_data_dotted, aes(x = fit_x, y = fit_y), color = "blue", linetype = "dotted") +
-  
-  # MetaCycle fits (red)
   geom_line(data = fit_meta_solid, aes(x=fit_x, y=fit_y),
             inherit.aes = FALSE, color="blue",   linetype="solid",linewidth = 1.1) +
   geom_line(data = fit_meta_dotted, aes(x=fit_x, y=fit_y),
@@ -266,24 +197,18 @@ p2 <- ggplot() +
 
 
 
-cosinor_title <- paste0("Cosinor\nTrue Acrophase: ",acrophase,", Fit Acrophase: ",round(phase_hour_fit,2),
-                        "\nTrue Amplitude: ",amp,", Fit Amplitude: ",round(amp_fit,2))
-
 metacycle_title <- paste0("MetaCycle-ARS\nTrue Acrophase: ",acrophase,", Fit Acrophase: ",round(meta_phase,2),
                         "\nTrue Amplitude: ",amp,", Fit Amplitude: ",round(meta_amp,2))
 
 
-p1 <- p1 + 
-  ggtitle(cosinor_title) +
-  scale_y_continuous(limits = c(y_min - 0.5, y_max + 0.5))
 
-p2 <- p2 + 
+
+plot <- plot + 
   ggtitle(metacycle_title) +
   scale_y_continuous(limits = c(y_min - 0.5, y_max + 0.5))
 
-# Combine the plots side by side
-combined_plot <- p1 + p2 + 
-  plot_layout(ncol = 2) & 
+plot <- plot + 
+  plot_layout(ncol = 1) & 
   theme(axis.title.y = element_text(vjust = 1)) & 
   theme(
     axis.title.x = element_text(size = 16,  margin = margin(t = 6)),
@@ -293,25 +218,20 @@ combined_plot <- p1 + p2 +
     plot.title = element_text(face = "bold", size = 16)
   )
 
-combined_plot <- combined_plot + 
+plot <- plot + 
   plot_annotation(
     theme = theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"))
   )
-
-
 
 
 plot_path <- paste0("plots/amp_test_acrophase",acrophase,".png")
 
 
 ggsave(plot_path,
-       combined_plot,
-       width = 10, height = 6, units = "in", dpi = 300,
+       plot,
+       width = 8, height = 6, units = "in", dpi = 300,
        bg = "white")
 
-
-cat("Cosinor Phase:", phase_hour_fit, "hours\n")
-cat("Cosinor Amplitude:", amp_fit, "\n")
 
 cat("MetaCycle Phase:", meta_phase, "hours\n")
 cat("MetaCycle Amplitude:", meta_amp, "\n")

@@ -171,3 +171,41 @@ if (!dir.exists("plots")) {
 
 ggsave("plots/simple_example.png", rose_plot, width = 8, height = 6, dpi = 300)
 
+
+
+############################################################################################################
+
+# predicted amp percent error plot
+
+amp_percent_errors <- (results$meta3d_AMP - amp) / amp * 100
+
+
+df_plot <- data.frame(
+  true_acrophases = true_acrophases,
+  amp_percent_errors = amp_percent_errors
+)
+
+scatter_plot <- ggplot(df_plot, aes(x = true_acrophases, y = amp_percent_errors)) +
+  geom_point(size = 0.5) +
+  theme_minimal() +
+  labs(x = "True Acrophase (hours)", y = "Predicted Amplitude % Error ") + 
+  scale_x_continuous(breaks = seq(0, 24, by = 3), limits = c(0, 24))
+
+
+
+filename <- paste("plots/simple_example_predicted_amps.png",sep="")
+ggsave(filename, plot = scatter_plot, width = 4, height = 4, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@ set.seed(20251021)
 
 num_genes <- 3000
 
-num_subjects <- 20
+num_subjects <- 1
 amp <- 2
 mesor <- 5
 
@@ -76,18 +76,10 @@ design <- data.frame(
   stringsAsFactors = FALSE
 )
 
-
-
-time_grid <- sort(unique(design$hour))
-collapsed_mat <- sapply(time_grid, function(h) {
-  cols <- which(design$hour == h)
-  if (length(cols) == 1L) expression_matrix[, cols] else rowMeans(expression_matrix[, cols, drop = FALSE])
-})
-
-colnames(collapsed_mat) <- as.character(time_grid)  # e.g., "0" "6" "12" "18"
+colnames(expression_matrix) <- as.character(times)
 
 arser_df <- data.frame(Probes = rownames(expression_matrix),
-                       collapsed_mat,
+                       expression_matrix,
                        check.names = FALSE)
 
 out_path <- "input/python_arser/python_arser_input.txt"
