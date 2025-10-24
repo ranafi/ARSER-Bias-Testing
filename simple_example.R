@@ -188,7 +188,7 @@ df_plot <- data.frame(
 scatter_plot <- ggplot(df_plot, aes(x = true_acrophases, y = amp_percent_errors)) +
   geom_point(size = 0.5) +
   theme_minimal() +
-  labs(x = "True Acrophase (hours)", y = "Predicted Amplitude % Error ") + 
+  labs(x = "True Transcript Acrophase (hours)", y = "% Error in ARSER Amplitude Estimate") + 
   scale_x_continuous(breaks = seq(0, 24, by = 3), limits = c(0, 24))
 
 
